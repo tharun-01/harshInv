@@ -10,4 +10,4 @@ Each folder is a self-contained site (open `index.html`, or drag the folder onto
 | `04-boarding-pass/` | Work in progress: the departures-board letters don't settle on the right words yet. |
 | `05-curtain-garden/` | Work in progress: early draft, not finished. |
 
-After deploying, replace `SITE_URL` in a template's `index.html` with its live address so the WhatsApp link preview shows.
+06 is live at https://splendorous-bunny-ed293d.netlify.app. For the other templates, replace `SITE_URL` in `index.html` with the live address so the WhatsApp link preview shows.
