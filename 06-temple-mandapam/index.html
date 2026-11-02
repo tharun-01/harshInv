@@ -576,6 +576,7 @@ body.hero-on .art{opacity:1;transform:none}
       document.body.classList.add('hero-on');
       petals(18000);
       setTimeout(checkFades, 1600);
+      enteredAt = performance.now();
       idleTimer = setTimeout(startAutoScroll, 5000);
     }, reduced ? 50 : 1500);
   }
@@ -585,7 +586,7 @@ body.hero-on .art{opacity:1;transform:none}
   // ---------- Gentle auto-scroll when the guest is idle ----------
   // Starts 5 s after the inner page appears, only if the guest hasn't scrolled yet.
   // The first touch, wheel, key or manual scroll turns it off for good. It pauses at the scratch heart until it is revealed.
-  let autoOn = false, idleTimer = null, userTookOver = false, ownScroll = false;
+  let autoOn = false, idleTimer = null, userTookOver = false, ownScroll = false, enteredAt = 0;
   const SPEED = 55; // px per second
   function userActive() {
     userTookOver = true;
@@ -593,7 +594,13 @@ body.hero-on .art{opacity:1;transform:none}
     clearTimeout(idleTimer);
   }
   ['wheel', 'touchstart', 'pointerdown', 'keydown'].forEach(t => addEventListener(t, () => { if (entered) userActive(); }, { passive: true }));
-  addEventListener('scroll', () => { if (entered && !ownScroll) userActive(); ownScroll = false; }, { passive: true });
+  // iOS fires a layout-driven scroll event right as the hero appears (toolbar collapse,
+  // petals/curtain reflow) with no user gesture behind it; ignore scrolls in that brief window
+  // so the idle auto-scroll doesn't get cancelled before it ever starts.
+  addEventListener('scroll', () => {
+    if (entered && !ownScroll && performance.now() - enteredAt > 600) userActive();
+    ownScroll = false;
+  }, { passive: true });
   function startAutoScroll() {
     if (!entered || reduced || autoOn || userTookOver) return;
     autoOn = true;
